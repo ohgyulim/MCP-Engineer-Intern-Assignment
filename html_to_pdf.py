@@ -1,10 +1,10 @@
 from typing import Union
 from pathlib import Path
 
-from playwright.sync_api import sync_playwright
+from playwright.async_api import async_playwright
 
 
-def html_to_pdf(input_file_path: Union[str, Path], output_file_path: Union[str, Path]):
+async def html_to_pdf(input_file_path: Union[str, Path], output_file_path: Union[str, Path]) -> str:
     """Convert HTM/HTML to PDF
 
     Parameters
@@ -25,25 +25,11 @@ def html_to_pdf(input_file_path: Union[str, Path], output_file_path: Union[str, 
     output_file_path.parent.mkdir(parents=True, exist_ok=True)
     abs_file_path = input_file_path.absolute().as_uri()
 
-    with sync_playwright() as p:
-        browser = p.chromium.launch()
-        page = browser.new_page()
-        page.goto(abs_file_path)
-        page.pdf(path=output_file_path)
-        browser.close()
+    async with async_playwright() as p:
+        browser = await p.chromium.launch()
+        page = await browser.new_page()
+        await page.goto(abs_file_path)
+        await page.pdf(path=output_file_path)
+        await browser.close()
         
-
-def check_valid_html_ext(file_path: Union[str, Path]) -> bool:
-    html_file_ext = [".html", ".htm"]
-    for ext in html_file_ext:
-        if file_path.suffix.lower() == ext:
-            return True
-    return False
-    
-    
-def check_valid_file_name(file_path: Union[str, Path]) -> bool:
-    invalid_substrings = ["xex"]
-    for substring in invalid_substrings:
-        if substring in file_path.as_posix():
-            return False
-    return True
+    return str(output_file_path)
