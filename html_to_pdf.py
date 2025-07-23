@@ -47,11 +47,3 @@ def check_valid_file_name(file_path: Union[str, Path]) -> bool:
         if substring in file_path.as_posix():
             return False
     return True
-
-
-if __name__ == "__main__":
-    saving_path = "pdf_from_html"
-    for html_file_path in Path("html").glob("**/*"):
-        if check_valid_html_ext(html_file_path) and check_valid_file_name(html_file_path):
-            output_pdf_path = f"{saving_path}/new_{html_file_path.stem}.pdf"
-            html_to_pdf(html_file_path, output_pdf_path)

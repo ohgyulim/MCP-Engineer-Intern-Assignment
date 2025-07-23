@@ -3,7 +3,32 @@ import requests
 import zipfile
 import io
 
+
 def download_sec_filing(cik: str, year: str, filing_type: str, output_dir_path: str) -> str:
+    """
+    Download the latest SEC filing data.
+
+    Parameters
+    ----------
+    cik : str
+        Central Index Key (CIK) of the company.
+    year : str
+        Target filing year.
+    filing_type : str
+        SEC filing form type.
+    output_dir_path : str
+        Saving file path.
+
+    Returns
+    -------
+    return_path: str
+        Path to the primary HTML document.
+
+    Examples
+    --------
+    >>> path = download_sec_filing("0001018724", "2024", "8-K", "html/amzn_2024_8_k")
+    """
+
     # example json_data url: https://data.sec.gov/submissions/CIK0001018724.json
     headers = {"User-Agent": "MyApp your.email@domain.com"}
     url = f"https://data.sec.gov/submissions/CIK{cik}.json"
@@ -36,7 +61,3 @@ def download_sec_filing(cik: str, year: str, filing_type: str, output_dir_path: 
             return_path = path
     
     return return_path
-
-
-# if __name__ == "__main__":
-    
