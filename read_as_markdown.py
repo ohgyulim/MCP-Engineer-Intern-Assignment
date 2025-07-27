@@ -22,7 +22,12 @@ def read_as_markdown(input_file_path: Union[str, Path]) -> str:
     >>> input_file_path = "examples/example.pdf"
     >>> context = read_as_markdown(input_file_path)
     """
+    
     input_file_path = Path(input_file_path)
     converter = DocumentConverter()
-    markdown = converter.convert(input_file_path).document.export_to_markdown()
+    try:
+        markdown = converter.convert(input_file_path).document.export_to_markdown()
+    except Exception as e:
+        return f"[Docling Error]: {e}"
+    
     return markdown
