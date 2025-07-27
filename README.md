@@ -25,12 +25,11 @@ cd MCP-Engineer-Intern-Assignment
 ```
 
 
-### Adding MCP to your python project
+### Install the required dependencies
 
-Install the required dependencies:
 
 ```bash
-pip install fastmcp docling playwright requests
+pip install -r requirements.txt
 playwright install --with-deps
 ```
 
@@ -41,7 +40,7 @@ playwright install --with-deps
 ### Pull the Docker image
 
 ```bash
-docker pull ohgyulim/sec-filing-tool:v1.8
+docker pull ohgyulim/sec-filing-tool:v2.0
 ```
 
 
@@ -61,6 +60,9 @@ fastmcp run main.py:mcp --transport stdio
 
 
 ### Claude Desktop Integration
+
+- Windows: `%APPDATA%\Claude\claude_desktop_config.json`
+- MacOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
 
 Use the following `claude_desktop_config.json`:
 
@@ -93,10 +95,10 @@ Use the following `claude_desktop_config.json`:
         "-i",
         "--name",
         "sec-filing-container",
-        "ohgyulim/sec-filing-tool:v1.8",
+        "ohgyulim/sec-filing-tool:v2.0",
         "fastmcp",
         "run",
-        "main.py:mcp",
+        "MCP-Engineer-Intern-Assignment/main.py:mcp",
         "--transport",
         "stdio"
       ]
@@ -110,7 +112,7 @@ Use the following `claude_desktop_config.json`:
 
 ### Prompt Template
 
-You can use all three tools in a single natural language prompt like this in Claude Desktop:
+You can use all three tools in a single prompt like this in Claude Desktop:
 
 Template variables:
 - `{filing_type}`: Filing type (e.g., 10-K, 8-K, 10-Q)
@@ -122,7 +124,7 @@ Template variables:
 ```
 Please download the latest **{filing-type}** filing from **{company name or cik}** in **{year}**. Save it in the folder **{your_path}**.
 Then, convert the main HTML file in that folder to PDF and save it in **{your_path}**/new_{comapny}_{year}_{filing_type}.pdf.
-Finally, extract the content of that HTML file as markdown and Show me markdown.
+Finally, extract the content of that HTML file as markdown and Show me summarized markdown.
 ```
 
 
@@ -130,7 +132,7 @@ Finally, extract the content of that HTML file as markdown and Show me markdown.
 ```
 Please download the latest 10-K filing from Amazon (CIK 0001018724) in 2024. Save it in the folder /app/html/amzn_2024_10_k.
 Then, convert the main HTML file in that folder to PDF and save it in /app/pdf/new_{comapny}_{year}_{filing_type}.pdf.
-Finally, extract the content of that HTML file as markdown and Show me markdown.
+Finally, extract the content of that HTML file as markdown and Show me summarized markdown.
 ```
 
 **Note: All paths must be under /app/ since the tools are containerized.**
