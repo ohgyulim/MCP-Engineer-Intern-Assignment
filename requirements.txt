@@ -3,3 +3,4 @@ docling
 requests
 playwright==1.53.0
 pandas
+uv
