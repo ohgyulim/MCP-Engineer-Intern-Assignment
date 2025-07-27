@@ -29,45 +29,63 @@ def download_sec_filing(cik: str, year: str, filing_type: str, output_dir_path: 
     --------
     >>> path = download_sec_filing("0001018724", "2024", "8-K", "html/amzn_2024_8_k")
     """
-
+    
     # example json_data url: https://data.sec.gov/submissions/CIK0001018724.json
     headers = {"User-Agent": "MyApp your.email@domain.com"}
     url = f"https://data.sec.gov/submissions/CIK{cik}.json"
-    res = requests.get(url, headers=headers)
-    data = res.json()
     
-    filings_recent_data = (
-        pd.DataFrame(data["filings"]["recent"])
-        .assign(
-            reportDate=lambda d: pd.to_datetime(d["reportDate"]),
-            reportYear=lambda d: d["reportDate"].dt.year,
+    
+    # 1. request for filing data
+    try:
+        res = requests.get(url, headers=headers)
+        res.raise_for_status()
+        data = res.json()
+    except requests.RequestException as e:
+        return f"[Request Error]: {e}"
+    except ValueError:
+        return "[Parse Error]: Failed to parse JSON response."
+    
+    
+    # 2. process data for downloading files
+    try:
+        filings_recent_data = (
+            pd.DataFrame(data["filings"]["recent"])
+            .assign(
+                reportDate=lambda d: pd.to_datetime(d["reportDate"]),
+                reportYear=lambda d: d["reportDate"].dt.year,
+            )
         )
-    )
-    target_row = (
-        filings_recent_data
-        .query(f"form == '{filing_type}' and reportYear == {year}")
-        .sort_values("reportDate", ascending=False)
-        .iloc[0]
-    )
-    accession_number = target_row["accessionNumber"]
-    primary_document = target_row["primaryDocument"]
-        
+        target_row = (
+            filings_recent_data
+            .query(f"form == '{filing_type}' and reportYear == {year}")
+            .sort_values("reportDate", ascending=False)
+            .iloc[0]
+        )
+        accession_number = target_row["accessionNumber"]
+        primary_document = target_row["primaryDocument"]
+    except (KeyError, IndexError):
+        return "[Not Found]: Please modify your search conditions."
+    
+    
+    # 3. download and extract files
     output_path = Path(output_dir_path)
     output_path.mkdir(parents=True, exist_ok=True)
-    
     download_url = f"https://www.sec.gov/Archives/edgar/data/{cik}/{accession_number.replace('-','')}/{accession_number}-xbrl.zip"
-    res = requests.get(download_url, headers=headers)
-
-    with zipfile.ZipFile(io.BytesIO(res.content)) as zf:
-        zf.extractall(path=output_path)
-
-    return_path = ""
+    try:
+        res = requests.get(download_url, headers=headers)
+        res.raise_for_status()
+        with zipfile.ZipFile(io.BytesIO(res.content)) as zf:
+            zf.extractall(path=output_path)
+    except requests.RequestException as e:
+        return f"[Request Error]: {e}"
+    except:
+        return "[Zip Error]: Error for zipfile extract process."
+    
+    # 4. return result path
+    result_path = ""
     for path in output_path.glob("*"):
         if path.name == primary_document:
-            return_path = path
+            result_path = path
+            break
     
-    return return_path
-
-
-if __name__ == "__main__":
-    print(download_sec_filing("0001018724", "2024", "8-K", "html/amzn_2024_8_k"))
+    return result_path
