@@ -24,12 +24,15 @@ async def html_to_pdf(input_file_path: Union[str, Path], output_file_path: Union
     output_file_path = Path(output_file_path)
     output_file_path.parent.mkdir(parents=True, exist_ok=True)
     abs_file_path = input_file_path.absolute().as_uri()
-
-    async with async_playwright() as p:
-        browser = await p.chromium.launch()
-        page = await browser.new_page()
-        await page.goto(abs_file_path)
-        await page.pdf(path=output_file_path)
-        await browser.close()
+    
+    try:
+        async with async_playwright() as p:
+            browser = await p.chromium.launch()
+            page = await browser.new_page()
+            await page.goto(abs_file_path)
+            await page.pdf(path=output_file_path)
+            await browser.close()
+    except Exception as e:
+        return f"[Playwright Error]: {e}"
         
     return str(output_file_path)
