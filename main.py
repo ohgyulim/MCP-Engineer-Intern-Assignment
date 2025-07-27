@@ -16,3 +16,6 @@ async def wrapped_html_to_pdf(input_file_path, output_file_path):
 @mcp.tool()
 def wrapped_read_as_markdown(input_file_path):
     return read_as_markdown(input_file_path)
+
+if __name__ == "__main__":
+    mcp.run()
