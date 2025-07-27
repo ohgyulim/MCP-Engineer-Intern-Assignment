@@ -28,6 +28,7 @@ def read_as_markdown(input_file_path: Union[str, Path]) -> str:
     try:
         markdown = converter.convert(input_file_path).document.export_to_markdown()
     except Exception as e:
-        return f"[Docling Error]: {e}"
+        print(f"[Docling Error]: {e}")
+        raise
     
     return markdown

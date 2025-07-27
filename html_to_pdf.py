@@ -33,6 +33,7 @@ async def html_to_pdf(input_file_path: Union[str, Path], output_file_path: Union
             await page.pdf(path=output_file_path)
             await browser.close()
     except Exception as e:
-        return f"[Playwright Error]: {e}"
+        print(f"[Playwright Error]: {e}")
+        raise
         
     return str(output_file_path)
